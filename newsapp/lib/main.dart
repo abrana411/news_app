@@ -3,6 +3,7 @@ import 'package:newsapp/providers/newsprovider.dart';
 import './screens/home.dart';
 
 import 'package:provider/provider.dart';
+import './screens/category.dart';
 
 void main() {
   runApp(ChangeNotifierProvider(
@@ -15,6 +16,7 @@ void main() {
       routes: {
         "/": (ctx) => HomeScreen(),
         // HomeScreen.routeName: (ctx) => HomeScreen(),
+        categoryScreen.routeName: (ctx) => categoryScreen(category: "india")
       },
     ),
   ));

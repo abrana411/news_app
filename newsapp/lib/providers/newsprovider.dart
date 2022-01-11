@@ -6,51 +6,120 @@ import '../models/newsmodel.dart';
 
 class newsProvider with ChangeNotifier {
   List<newsData> _items = [];
-  List<newsData> _itemsSlider = [];
+  List<newsData> _itemsindia = [];
+  List<newsData> _itembusiness = [];
+  List<newsData> _itemgeneral = [];
+  List<newsData> _itemhealth = [];
+  List<newsData> _itemscience = [];
+  List<newsData> _itemsports = [];
+  List<newsData> _itemtechnology = [];
+  List<newsData> _itementertainment = [];
 
   List<newsData> get item {
     return [..._items]; //returning the clone of this _items list
   }
 
-  List<newsData> get itemSlider {
-    return [..._itemsSlider]; //returning the clone of this _items list
+  List<newsData> itemCategory(String cat) {
+    //here not making a getter rather a method that will give the copy of the desired ategory list having news
+    if (cat == "india") {
+      return [..._itemsindia];
+    } else if (cat == "business") {
+      return [..._itembusiness];
+    } else if (cat == "entertainment") {
+      return [..._itementertainment];
+    } else if (cat == "general") {
+      return [..._itemgeneral];
+    } else if (cat == "health") {
+      return [..._itemhealth];
+    } else if (cat == "science") {
+      return [..._itemscience];
+    } else if (cat == "sports") {
+      return [..._itemsports];
+    } else //if cat is equal to technology
+    {
+      return [..._itemtechnology];
+    }
   }
 
-  Future<void> fetchNews(String kiskeuper, String what) async {
+  Future<void> fetchNews(String kiskeuper) async {
     var url1 =
         "https://newsapi.org/v2/top-headlines?country=in&category=$kiskeuper&apiKey=dde8eb71d71b4f79a8f5e0b9943fd73a";
-    var url2 =
-        "https://newsapi.org/v2/top-headlines?q=$what&apiKey=dde8eb71d71b4f79a8f5e0b9943fd73a";
+
     try {
       final res1 = await http.get(Uri.parse(url1));
-      final res2 = await http.get(Uri.parse(url2));
+
       final data1 = jsonDecode(res1.body);
-      final data2 = jsonDecode(res2.body);
+
       data1["articles"].forEach((ele) {
         //since data["articles"] is a list having all the properties which we want so using the loop on this list and each ele here is a map having a key value pair
-        newsData instace = newsData(
-            //creating a new instance
-            UrltoMore: ele["url"],
-            ImageToUrl: ele["urlToImage"],
-            desc: ele["description"],
-            title: ele["title"]);
+        try {
+          //checking for a particular news error here too
+          newsData instance = newsData(
+              //creating a new instance
+              UrltoMore: ele["url"],
+              ImageToUrl: ele["urlToImage"],
+              desc: ele["description"],
+              title: ele["title"]);
 
-        _items.add(instace); //adding this new instamce to the _items list
-      });
-      data2["articles"].forEach((ele) {
-        newsData instace = newsData(
-            //creating a new instance
-            UrltoMore: ele["url"],
-            ImageToUrl: ele["urlToImage"],
-            desc: ele["description"],
-            title: ele["title"]);
+          _items.add(instance); //adding this new instamce to the _items list
 
-        _itemsSlider.add(instace); //adding this new instamce to the _items list
+        } catch (e) {
+          print(e);
+        }
       });
       notifyListeners();
     } catch (err) {}
   }
+
+  Future<void> fetchCategoryNews(String what) async {
+    var url2 = "";
+    if (what == "india") {
+      url2 =
+          "https://newsapi.org/v2/top-headlines?q=$what&apiKey=dde8eb71d71b4f79a8f5e0b9943fd73a";
+    } else {
+      url2 =
+          "https://newsapi.org/v2/top-headlines?country=in&category=$what&apiKey=dde8eb71d71b4f79a8f5e0b9943fd73a";
+    }
+    try {
+      final res2 = await http.get(Uri.parse(url2));
+      final data2 = jsonDecode(res2.body);
+      data2["articles"].forEach((ele) {
+        try {
+          //if there is a problem in fetching a particular data then we are handling it here and will skip that if thats the case
+          newsData instance = newsData(
+              //creating a new instance
+              UrltoMore: ele["url"],
+              ImageToUrl: ele["urlToImage"],
+              desc: ele["description"],
+              title: ele["title"]);
+
+          if (what == "india") {
+            _itemsindia
+                .add(instance); //adding this new instance to the _items list
+          } else if (what == "business") {
+            _itembusiness.add(instance);
+          } else if (what == "entertainment") {
+            _itementertainment.add(instance);
+          } else if (what == "general") {
+            _itemgeneral.add(instance);
+          } else if (what == "health") {
+            _itemhealth.add(instance);
+          } else if (what == "science") {
+            _itemscience.add(instance);
+          } else if (what == "sports") {
+            _itemsports.add(instance);
+          } else //if what is equal to technology
+          {
+            _itemtechnology.add(instance);
+          }
+
+// business entertainment general health science sports technology
+        } catch (e) {
+          print(e);
+        }
+      });
+    } catch (err) {
+      print(err);
+    }
+  }
 }
-
-
-// The category you want to get headlines for. Possible options: business entertainment general healths cience sports technology
