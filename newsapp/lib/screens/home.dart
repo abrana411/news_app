@@ -10,6 +10,8 @@ import 'package:flutter/rendering.dart'; //for random method
 
 import '../providers/newsprovider.dart';
 import '../screens/category.dart';
+import '../screens/search.dart';
+import '../widgets/newsviews.dart';
 
 class HomeScreen extends StatefulWidget {
   static final routeName = "/home";
@@ -39,8 +41,19 @@ class _HomeScreenState extends State<HomeScreen> {
     "Technology",
     "Science",
   ]; //will use this in our navigation bar
-  void onSearched(String val) {
-    print(val);
+  void onSearched() {
+    if (searchTextController.text == "") //blank text
+    {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Add Something to search news for",
+              style: TextStyle(color: Colors.red))));
+    } else {
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => searchScreen(
+                  searchedText: searchTextController.text.trim())));
+    }
   }
 
   @override
@@ -59,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
       });
 
       Provider.of<newsProvider>(context, listen: false)
-          .fetchCategoryNews("india")
+          .fetchCategoryNews("india", false)
           .then((_) {
         //one provider above is enough to listen for the chnages this is just to call the function and fetch data and when notify listerners is called then the above will listen to the changes
         setState(() {
@@ -93,36 +106,59 @@ class _HomeScreenState extends State<HomeScreen> {
     final random = Random(); //creating instance of random class
     final String exgenre = genre[random.nextInt(genre.length)];
     return Scaffold(
+        extendBodyBehindAppBar:
+            true, //this make the content of body behind appbar too..and making it true as want to show rounded brder in appbar so...have to make color behind appbar same with body i will exend body from top itself
+
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          title: Title(color: Colors.black, child: const Text("Zap News")),
+          elevation: 0,
+          title: Title(color: Colors.black, child: const Text("Ab News")),
           centerTitle: true, //will make title appear on center
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(30))),
+          flexibleSpace: Container(
+            //to give gradient we can use flexible
+            decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(15),
+                    bottomRight: Radius.circular(15)),
+                gradient: LinearGradient(
+                    colors: [Colors.red, Colors.pink],
+                    begin: Alignment.topRight,
+                    end: Alignment.topLeft)),
+          ),
         ),
         body: SingleChildScrollView(
           //making enire page scrllable
           child: Container(
             decoration: _isLoading2
                 ? const BoxDecoration(color: Colors.transparent)
-                : const BoxDecoration(
-                    gradient: LinearGradient(
-                        stops: [0, 0.4],
-                        colors: [Colors.transparent, Colors.black],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight),
+                : BoxDecoration(
+                    gradient: LinearGradient(stops: [
+                      0,
+                      0.2
+                    ], colors: [
+                      Colors.pinkAccent.shade100,
+                      Colors.redAccent.shade200
+                    ], begin: Alignment.topLeft, end: Alignment.bottomRight),
                   ),
             child: Column(
               //1st cntainer-> search bar
               children: [
+                SizedBox(
+                  //therwise it will be behind appbar since i made he body look behind appbar too
+                  height: 92,
+                ),
                 Container(
                     margin: const EdgeInsets.all(15),
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
-                        color: Colors.black38),
+                        color: Colors.white),
                     child: Row(children: [
                       GestureDetector(
                         onTap: () {
-                          onSearched("hello");
+                          onSearched();
                         },
                         child: const Icon(Icons.search),
                       ),
@@ -132,8 +168,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       Expanded(
                           //textfield should be kept in expanded if used inside a row
                           child: TextField(
-                        onSubmitted: (str) {
-                          onSearched(str);
+                        onSubmitted: (val) {
+                          onSearched();
                         },
                         controller:
                             searchTextController, //assigning controller and the text in extfield will be stored in this controller now
@@ -149,7 +185,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 //2nd column-> will have our horizontal nav bar
                 Container(
-                  height: 60,
+                  decoration: BoxDecoration(
+                      border: Border.all(width: 1, color: Colors.red.shade900)),
+                  height: 70,
                   width: double.infinity,
                   child: ListView.builder(
                     shrinkWrap:
@@ -171,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: 15),
                             margin: const EdgeInsets.all(7),
                             decoration: BoxDecoration(
-                                color: Colors.red,
+                                color: Colors.amber[300],
                                 border:
                                     Border.all(width: 3, color: Colors.black),
                                 borderRadius: BorderRadius.circular(15)),
@@ -217,57 +255,107 @@ class _HomeScreenState extends State<HomeScreen> {
                                 // color: _isLoading2
                                 //     ? Colors.transparent
                                 //     : Colors.brown,
-                                child: Card(
-                                  child: Stack(
-                                    children: [
-                                      // Image.asset(
-                                      //   "assets/images/try.jpg",
-                                      Image.network(
-                                        item.ImageToUrl,
-                                        height: double.infinity,
-                                        fit: BoxFit.fitHeight,
-                                      ),
-                                      Positioned(
-                                          //his tells the positioning of the child inside this over the children of the stack
-                                          bottom: 0,
-                                          left: 0,
-                                          right: 0,
-                                          child: Container(
-                                              //margin: EdgeInsets.only(left: 10),
-                                              padding: EdgeInsets.only(
-                                                  left: 5, bottom: 15),
-                                              decoration: BoxDecoration(
-                                                gradient: LinearGradient(
-                                                    colors: [
-                                                      Colors.black
-                                                          .withOpacity(0),
-                                                      Colors.black
-                                                    ],
-                                                    begin: Alignment.topCenter,
-                                                    end:
-                                                        Alignment.bottomCenter),
-                                              ), //bottm righ was not having border radius even becuase of its parent's radius so have to do it manually
-                                              child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      item.title,
-                                                      //"hello",
-                                                      style: const TextStyle(
-                                                        fontSize: 15,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.white70,
+                                child: InkWell(
+                                  //like gesture detector but also shows a ripple effect
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (BuildContext context) =>
+                                                newsView(
+                                                    url: item
+                                                        .UrltoMore))); //passing the url to the web view
+                                  },
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                    child: Stack(
+                                      children: [
+                                        // Image.asset(
+                                        //   "assets/images/try.jpg",
+                                        //item.ImageToUrl.substring(1, 5) != "http"
+                                        //   ?
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              width: 2,
+                                              color: Colors.white,
+                                            ),
+                                            borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(20),
+                                                topRight: Radius.circular(20)),
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(20),
+                                                topRight: Radius.circular(20)),
+                                            child: Image.network(
+                                              item.ImageToUrl,
+                                              height: double.infinity,
+                                              fit: BoxFit.fitHeight,
+                                              errorBuilder: (BuildContext
+                                                      context, //if there is an error in showing the image then the widget inside his will be shown instead
+                                                  Object exception,
+                                                  StackTrace? stackTrace) {
+                                                return Image.asset(
+                                                  "assets/images/try.jpg",
+                                                  height: double.infinity,
+                                                  fit: BoxFit.fill,
+                                                  width: double.infinity,
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ),
+
+                                        // : Image.asset(
+                                        //     "assets/images/fail.png"),
+                                        Positioned(
+                                            //his tells the positioning of the child inside this over the children of the stack
+                                            bottom: 0,
+                                            left: 0,
+                                            right: 0,
+                                            child: Container(
+                                                //margin: EdgeInsets.only(left: 10),
+                                                padding: EdgeInsets.only(
+                                                    left: 5, bottom: 15),
+                                                decoration: BoxDecoration(
+                                                  gradient: LinearGradient(
+                                                      colors: [
+                                                        Colors.black
+                                                            .withOpacity(0),
+                                                        Colors.black
+                                                      ],
+                                                      begin:
+                                                          Alignment.topCenter,
+                                                      end: Alignment
+                                                          .bottomCenter),
+                                                ), //bottm righ was not having border radius even becuase of its parent's radius so have to do it manually
+                                                child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        item.title,
+                                                        //"hello",
+                                                        style: const TextStyle(
+                                                          fontSize: 15,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.white70,
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ])))
-                                    ],
+                                                    ])))
+                                      ],
+                                    ),
                                   ),
                                 ),
                               );
                             } catch (e) {
                               print(e);
+                              print("abab");
                               return Container(); //if there is some problem in this particular slide due to some api error or anything it will not be displayed because of try block and we will return an empty container in catch for that
                             }
                           }).toList(),
@@ -276,10 +364,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 //making a listview builder that will show news from network image (3rd container)
                 Container(
-                  decoration: BoxDecoration(
-                      color: _isLoading1 ? Colors.transparent : Colors.black,
-                      border: const Border(
-                          top: BorderSide(width: 2, color: Colors.white70))),
+                  decoration: _isLoading1
+                      ? BoxDecoration(color: Colors.transparent)
+                      : BoxDecoration(
+                          gradient: LinearGradient(
+                              colors: [
+                                Colors.deepOrangeAccent.shade200,
+                                Colors.pink.shade500
+                              ],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter),
+                          border: const Border(
+                              top:
+                                  BorderSide(width: 2, color: Colors.white70))),
                   child: _isLoading1
                       ? Container(
                           height: 400,
@@ -304,6 +401,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                         fontStyle: FontStyle.italic,
                                         fontWeight: FontWeight.bold),
                                   ),
+                                  Icon(
+                                    Icons.fiber_new_outlined,
+                                    color: Colors.white,
+                                  )
                                 ],
                               ),
                             ),
@@ -318,79 +419,109 @@ class _HomeScreenState extends State<HomeScreen> {
                                         color: Colors.red),
                                     margin: EdgeInsets.symmetric(
                                         horizontal: 15, vertical: 10),
-                                    child: Card(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(13)),
-                                      child: Stack(
-                                        children: [
-                                          ClipRRect(
+                                    child: InkWell(
+                                      //like gesture detector but also shows a ripple effect
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (BuildContext
+                                                        context) =>
+                                                    newsView(
+                                                        url: data[index]
+                                                            .UrltoMore))); //passing the url to the web view
+                                      },
+                                      child: Card(
+                                        shape: RoundedRectangleBorder(
                                             borderRadius:
-                                                BorderRadius.circular(13),
-                                            child:
-                                                // Image.asset(
-                                                //   "assets/images/try.jpg",
+                                                BorderRadius.circular(13)),
+                                        child: Stack(
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(13),
+                                              child:
+                                                  // Image.asset(
+                                                  //   "assets/images/try.jpg",
 
-                                                Image.network(
-                                              data[index].ImageToUrl,
-                                              height: double.infinity,
-                                              fit: BoxFit.fitHeight,
+                                                  Image.network(
+                                                data[index].ImageToUrl,
+                                                height: double.infinity,
+                                                fit: BoxFit.fitHeight,
+                                                errorBuilder: (BuildContext
+                                                        context, //if there is an error in showing the image then the widget inside his will be shown instead
+                                                    Object exception,
+                                                    StackTrace? stackTrace) {
+                                                  return Image.asset(
+                                                    "assets/images/try.jpg",
+                                                    height: double.infinity,
+                                                    fit: BoxFit.fill,
+                                                    width: double.infinity,
+                                                  );
+                                                },
+                                              ),
                                             ),
-                                          ),
-                                          Positioned(
-                                            //his tells the positioning of the child inside this over the children of the stack
-                                            bottom: 0,
-                                            left: 0,
-                                            right: 0,
-                                            child: Container(
-                                                padding: EdgeInsets.only(
-                                                    left: 5, bottom: 15),
-                                                decoration: BoxDecoration(
-                                                    gradient: LinearGradient(
-                                                        colors: [
-                                                          Colors.black
-                                                              .withOpacity(0),
-                                                          Colors.black
-                                                        ],
-                                                        begin: Alignment
-                                                            .bottomLeft,
-                                                        end: Alignment
-                                                            .bottomRight),
-                                                    borderRadius:
-                                                        const BorderRadius.only(
-                                                            bottomRight:
-                                                                Radius.circular(
-                                                                    13))), //bottm righ was not having border radius even becuase of its parent's radius so have to do it manually
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      data[index].title,
-                                                      style: const TextStyle(
-                                                          fontSize: 15,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Colors.white),
-                                                    ),
-                                                    Text(
-                                                        data[index]
-                                                                    .title
-                                                                    .length >
-                                                                55
-                                                            ? "${data[index].desc.substring(0, 56)}..."
-                                                            : data[index]
-                                                                .desc, //if length of the decs is more than 55 characters then dont show the whole and only show till 56 ...otherwise show the full if its kength is less than 55
+                                            Positioned(
+                                              //his tells the positioning of the child inside this over the children of the stack
+                                              bottom: 0,
+                                              left: 0,
+                                              right: 0,
+                                              child: Container(
+                                                  padding: EdgeInsets.only(
+                                                      left: 5, bottom: 15),
+                                                  decoration: BoxDecoration(
+                                                      gradient: LinearGradient(
+                                                          colors: [
+                                                            Colors.black
+                                                                .withOpacity(0),
+                                                            Colors.black
+                                                          ],
+                                                          begin: Alignment
+                                                              .bottomLeft,
+                                                          end: Alignment
+                                                              .bottomRight),
+                                                      borderRadius:
+                                                          const BorderRadius
+                                                                  .only(
+                                                              bottomRight: Radius
+                                                                  .circular(
+                                                                      13))), //bottm righ was not having border radius even becuase of its parent's radius so have to do it manually
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        data[index].title,
                                                         style: const TextStyle(
-                                                            fontSize: 13,
+                                                            fontSize: 15,
                                                             fontWeight:
                                                                 FontWeight.bold,
                                                             color:
-                                                                Colors.white54))
-                                                  ],
-                                                )),
-                                          )
-                                        ],
+                                                                Colors.white),
+                                                      ),
+                                                      Text(
+                                                          data[index]
+                                                                      .title
+                                                                      .length >
+                                                                  55
+                                                              ? "${data[index].desc.substring(0, 56)}..."
+                                                              : data[
+                                                                      index]
+                                                                  .desc, //if length of the decs is more than 55 characters then dont show the whole and only show till 56 ...otherwise show the full if its kength is less than 55
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize: 13,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: Colors
+                                                                      .white54))
+                                                    ],
+                                                  )),
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   );
@@ -416,18 +547,25 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: [
                                 Padding(
                                   padding: EdgeInsets.all(8.0),
-                                  child: OutlinedButton.icon(
-                                      onPressed: () {
-                                        setState(() {
-                                          _isShowmore = !_isShowmore;
-                                        });
-                                      },
-                                      icon: _isShowmore
-                                          ? Icon(Icons.expand_less_outlined)
-                                          : Icon(Icons.expand_more_sharp),
-                                      label: _isShowmore
-                                          ? Text("Show less")
-                                          : Text("Show more")),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: OutlinedButton.icon(
+                                        style: ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStateProperty.all<
+                                                    Color>(Colors.amber)),
+                                        onPressed: () {
+                                          setState(() {
+                                            _isShowmore = !_isShowmore;
+                                          });
+                                        },
+                                        icon: _isShowmore
+                                            ? Icon(Icons.expand_less_outlined)
+                                            : Icon(Icons.expand_more_sharp),
+                                        label: _isShowmore
+                                            ? Text("Show less")
+                                            : Text("Show more")),
+                                  ),
                                 ),
                               ],
                             ),

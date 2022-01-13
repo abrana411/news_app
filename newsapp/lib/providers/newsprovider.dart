@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:provider/provider.dart';
 import '../models/newsmodel.dart';
 
 class newsProvider with ChangeNotifier {
@@ -14,6 +13,7 @@ class newsProvider with ChangeNotifier {
   List<newsData> _itemsports = [];
   List<newsData> _itemtechnology = [];
   List<newsData> _itementertainment = [];
+  List<newsData> _itemSearched = [];
 
   List<newsData> get item {
     return [..._items]; //returning the clone of this _items list
@@ -35,9 +35,11 @@ class newsProvider with ChangeNotifier {
       return [..._itemscience];
     } else if (cat == "sports") {
       return [..._itemsports];
-    } else //if cat is equal to technology
-    {
+    } else if (cat == "technology") {
       return [..._itemtechnology];
+    } else //if any thing is searched
+    {
+      return [..._itemSearched];
     }
   }
 
@@ -71,14 +73,29 @@ class newsProvider with ChangeNotifier {
     } catch (err) {}
   }
 
-  Future<void> fetchCategoryNews(String what) async {
+  Future<void> fetchCategoryNews(String what, bool isSearched) async {
+    print("why bro");
     var url2 = "";
-    if (what == "india") {
-      url2 =
-          "https://newsapi.org/v2/top-headlines?q=$what&apiKey=dde8eb71d71b4f79a8f5e0b9943fd73a";
-    } else {
+    // if (what == "india") {
+    //   url2 =
+    //       "https://newsapi.org/v2/top-headlines?q=$what&apiKey=dde8eb71d71b4f79a8f5e0b9943fd73a";
+    // }
+    if (isSearched) {
+      _itemSearched.clear(); //clearing the previous data before entering new
+    }
+    if (what == "general" ||
+        what == "business" ||
+        what == "entertainment" ||
+        what == "health" ||
+        what == "science" ||
+        what == "sports" ||
+        what == "technology") {
       url2 =
           "https://newsapi.org/v2/top-headlines?country=in&category=$what&apiKey=dde8eb71d71b4f79a8f5e0b9943fd73a";
+    } else //if searched text is there then it can be anything and for the initial india also
+    {
+      url2 =
+          "https://newsapi.org/v2/top-headlines?q=$what&apiKey=dde8eb71d71b4f79a8f5e0b9943fd73a";
     }
     try {
       final res2 = await http.get(Uri.parse(url2));
@@ -92,34 +109,50 @@ class newsProvider with ChangeNotifier {
               ImageToUrl: ele["urlToImage"],
               desc: ele["description"],
               title: ele["title"]);
-
-          if (what == "india") {
-            _itemsindia
-                .add(instance); //adding this new instance to the _items list
-          } else if (what == "business") {
-            _itembusiness.add(instance);
-          } else if (what == "entertainment") {
-            _itementertainment.add(instance);
-          } else if (what == "general") {
-            _itemgeneral.add(instance);
-          } else if (what == "health") {
-            _itemhealth.add(instance);
-          } else if (what == "science") {
-            _itemscience.add(instance);
-          } else if (what == "sports") {
-            _itemsports.add(instance);
-          } else //if what is equal to technology
+          // if (ele["url"] != null &&
+          //     ele["urlToImage"] != null &&
+          //     ele["description"] != null &&
+          //     ele["title"] !=
+          //         null) //if we have any one of the above values as null then dont add this instance
+          // {
+          if (isSearched) //agar search kara h to sidha _iem/serached me add krenge...agar search nhi kara tab he check krenge bakiyo ko
           {
-            _itemtechnology.add(instance);
+            print("here");
+            _itemSearched.add(instance);
+          } else {
+            if (what == "india") {
+              _itemsindia
+                  .add(instance); //adding this new instance to the _items list
+            } else if (what == "business") {
+              _itembusiness.add(instance);
+            } else if (what == "entertainment") {
+              _itementertainment.add(instance);
+            } else if (what == "general") {
+              _itemgeneral.add(instance);
+            } else if (what == "health") {
+              _itemhealth.add(instance);
+            } else if (what == "science") {
+              _itemscience.add(instance);
+            } else if (what == "sports") {
+              _itemsports.add(instance);
+            } else //if what is equal to technology
+            {
+              _itemtechnology.add(instance);
+            }
           }
+          //}
 
 // business entertainment general health science sports technology
         } catch (e) {
           print(e);
+          print("hello2");
         }
       });
+      print(_itemSearched);
+      notifyListeners();
     } catch (err) {
       print(err);
+      print("hello1");
     }
   }
 }

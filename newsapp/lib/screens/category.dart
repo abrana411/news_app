@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:newsapp/models/newsmodel.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/newsprovider.dart';
+import '../widgets/newsviews.dart';
 
 class categoryScreen extends StatefulWidget {
   static final routeName = "/category";
@@ -14,6 +16,7 @@ class categoryScreen extends StatefulWidget {
 }
 
 class _categoryScreenState extends State<categoryScreen> {
+  var _isShowmore = false;
   var _isLoading = true;
   var _hasInitialized = false;
   @override
@@ -25,7 +28,7 @@ class _categoryScreenState extends State<categoryScreen> {
       });
 
       Provider.of<newsProvider>(context)
-          .fetchCategoryNews(widget.category)
+          .fetchCategoryNews(widget.category, false)
           .then((val) {
         setState(() {
           _isLoading = false;
@@ -37,21 +40,52 @@ class _categoryScreenState extends State<categoryScreen> {
     super.didChangeDependencies();
   }
 
+  //mehod to make first character of a string capital and rest small
+  String firstcharCap(String str) {
+    return (str[0].toUpperCase() + str.substring(1).toLowerCase());
+  }
+
   @override
   Widget build(BuildContext context) {
-    var _isShowmore = true;
     var data = Provider.of<newsProvider>(context, listen: false).itemCategory(
         widget.category); //getting the list of news of desired category
     return Scaffold(
+      extendBodyBehindAppBar:
+          true, //this make the content of body behind appbar too..and making it true as want to show rounded brder in appbar so...have to make color behind appbar same with body i will exend body from top itself
+
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text("AB News"),
+        elevation: 0,
+        title: Title(
+            color: Colors.black,
+            child: Text(firstcharCap(widget.category) + " News")),
+        centerTitle: true, //will make title appear on center
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(30))),
+        flexibleSpace: Container(
+          //to give gradient we can use flexible
+          decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(15),
+                  bottomRight: Radius.circular(15)),
+              gradient: LinearGradient(
+                  colors: [Colors.red, Colors.pink],
+                  begin: Alignment.topRight,
+                  end: Alignment.topLeft)),
+        ),
       ),
       body: SingleChildScrollView(
         child: Container(
-          decoration: BoxDecoration(
-              color: _isLoading ? Colors.transparent : Colors.black,
-              border: const Border(
-                  top: BorderSide(width: 2, color: Colors.white70))),
+          decoration: _isLoading
+              ? const BoxDecoration(color: Colors.transparent)
+              : BoxDecoration(
+                  gradient: LinearGradient(
+                      // stops: [0, 0.9],
+                      colors: [Colors.red.shade200, Colors.deepOrange.shade300],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight),
+                  border:
+                      Border(top: BorderSide(width: 2, color: Colors.white70))),
           child: _isLoading
               ? Container(
                   height: 400,
@@ -61,24 +95,6 @@ class _categoryScreenState extends State<categoryScreen> {
                 )
               : Column(
                   children: [
-                    //will show a text saying current news:-
-                    Container(
-                      padding: const EdgeInsets.only(top: 10),
-                      margin: const EdgeInsets.only(left: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            widget.category,
-                            style: const TextStyle(
-                                fontSize: 20,
-                                color: Colors.white,
-                                fontStyle: FontStyle.italic,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
                     ListView.builder(
                       itemBuilder: (ctx, index) {
                         try {
@@ -87,70 +103,96 @@ class _categoryScreenState extends State<categoryScreen> {
                             height: 250,
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(13),
-                                color: Colors.red),
+                                color: Colors.green),
                             margin: const EdgeInsets.symmetric(
                                 horizontal: 15, vertical: 10),
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(13)),
-                              child: Stack(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(13),
-                                    child:
-                                        // Image.asset(
-                                        //   "assets/images/try.jpg",
+                            child: InkWell(
+                              //like gesture detector but also shows a ripple effect
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (BuildContext context) => newsView(
+                                            url: data[index]
+                                                .UrltoMore))); //passing the url to the web view
+                              },
+                              child: Card(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(13)),
+                                child: Stack(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(13),
+                                      child:
+                                          // Image.asset(
+                                          //   "assets/images/try.jpg",
 
-                                        Image.network(
-                                      data[index].ImageToUrl,
-                                      height: double.infinity,
-                                      fit: BoxFit.fitHeight,
+                                          Image.network(
+                                        data[index].ImageToUrl,
+                                        height: double.infinity,
+                                        fit: BoxFit.fill,
+                                        width: double.infinity,
+                                        errorBuilder: (BuildContext
+                                                context, //if there is an error in showing the image then the widget inside his will be shown instead
+                                            Object exception,
+                                            StackTrace? stackTrace) {
+                                          return Image.asset(
+                                            "assets/images/try.jpg",
+                                            height: double.infinity,
+                                            fit: BoxFit.fill,
+                                            width: double.infinity,
+                                          );
+                                        },
+                                      ),
                                     ),
-                                  ),
-                                  Positioned(
-                                    //his tells the positioning of the child inside this over the children of the stack
-                                    bottom: 0,
-                                    left: 0,
-                                    right: 0,
-                                    child: Container(
-                                        padding: EdgeInsets.only(
-                                            left: 5, bottom: 15),
-                                        decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                                colors: [
-                                                  Colors.black.withOpacity(0),
-                                                  Colors.black
-                                                ],
-                                                begin: Alignment.bottomLeft,
-                                                end: Alignment.bottomRight),
-                                            borderRadius: const BorderRadius
-                                                    .only(
-                                                bottomRight: Radius.circular(
-                                                    13))), //bottm righ was not having border radius even becuase of its parent's radius so have to do it manually
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              data[index].title,
-                                              style: const TextStyle(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white),
-                                            ),
-                                            Text(
-                                                data[index].title.length > 55
-                                                    ? "${data[index].desc.substring(0, 56)}..."
-                                                    : data[index]
-                                                        .desc, //if length of the decs is more than 55 characters then dont show the whole and only show till 56 ...otherwise show the full if its kength is less than 55
+                                    Positioned(
+                                      //his tells the positioning of the child inside this over the children of the stack
+                                      bottom: 0,
+                                      left: 0,
+                                      right: 0,
+                                      child: Container(
+                                          padding: EdgeInsets.only(
+                                              left: 5, bottom: 15),
+                                          decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                  colors: [
+                                                    Colors.orange.shade400
+                                                        .withOpacity(0.5),
+                                                    Colors.pink.shade400
+                                                        .withOpacity(0.5)
+                                                  ],
+                                                  begin: Alignment.bottomLeft,
+                                                  end: Alignment.bottomRight),
+                                              borderRadius: const BorderRadius
+                                                      .only(
+                                                  bottomRight: Radius.circular(
+                                                      13))), //bottm righ was not having border radius even becuase of its parent's radius so have to do it manually
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                data[index].title,
                                                 style: const TextStyle(
-                                                    fontSize: 13,
+                                                    fontSize: 15,
                                                     fontWeight: FontWeight.bold,
-                                                    color: Colors.white54))
-                                          ],
-                                        )),
-                                  )
-                                ],
+                                                    color: Colors.white),
+                                              ),
+                                              Text(
+                                                  data[index].title.length > 55
+                                                      ? "${data[index].desc.substring(0, 56)}..."
+                                                      : data[index]
+                                                          .desc, //if length of the decs is more than 55 characters then dont show the whole and only show till 56 ...otherwise show the full if its kength is less than 55
+                                                  style: const TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: Colors.white54))
+                                            ],
+                                          )),
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
                           );
@@ -161,12 +203,11 @@ class _categoryScreenState extends State<categoryScreen> {
                       },
                       itemCount: data.length > 5
                           ? _isShowmore
-                              ? data.length > 10
-                                  ? 10
-                                  : data.length
-                              : data.length
-                          : data
-                              .length, //this is nested ternery..and  first iam checking if data.length is greter than 5 if it is then checking for show more variable..if its length is not greter than give just data.length...and in the showmore condition then if it is true then checking if data.length is greter than 10 then return 10 otherwise data.length and if show more is not active then too data.length
+                              ? data.length < 10
+                                  ? data.length
+                                  : 10
+                              : 5
+                          : data.length,
                       physics:
                           const NeverScrollableScrollPhysics(), //will nt use the scrlling feature of the listview rather will make he whole page scrllable ie body of home screen
                       shrinkWrap:
@@ -175,21 +216,44 @@ class _categoryScreenState extends State<categoryScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: OutlinedButton.icon(
-                              onPressed: () {
-                                setState(() {
-                                  _isShowmore = !_isShowmore;
-                                });
-                              },
-                              icon: _isShowmore
-                                  ? Icon(Icons.expand_less_outlined)
-                                  : Icon(Icons.expand_more_sharp),
-                              label: _isShowmore
-                                  ? Text("Show less")
-                                  : Text("Show more")),
-                        ),
+                        Container(
+                          margin: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(25),
+                              border:
+                                  Border.all(width: 2, color: Colors.white54),
+                              color: Colors.red),
+                          child: TextButton.icon(
+                            onPressed: () {
+                              print("hello");
+                              setState(() {
+                                _isShowmore = !_isShowmore;
+                              });
+                            },
+                            icon: _isShowmore
+                                ? Icon(
+                                    Icons.expand_less_outlined,
+                                    color: Colors.amber,
+                                  )
+                                : Icon(
+                                    Icons.expand_more_sharp,
+                                    color: Colors.amber,
+                                  ),
+                            label: _isShowmore
+                                ? Text(
+                                    "Show Less",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white),
+                                  )
+                                : Text(
+                                    "Show More",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white),
+                                  ),
+                          ),
+                        )
                       ],
                     ),
                   ],
