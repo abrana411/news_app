@@ -14,9 +14,10 @@ void main() {
         primarySwatch: Colors.blue,
       ),
       routes: {
-        "/": (ctx) => HomeScreen(),
+        "/": (ctx) => const HomeScreen(),
         // HomeScreen.routeName: (ctx) => HomeScreen(),
-        categoryScreen.routeName: (ctx) => categoryScreen(category: "india")
+        categoryScreen.routeName: (ctx) =>
+            const categoryScreen(category: "india")
       },
     ),
   ));

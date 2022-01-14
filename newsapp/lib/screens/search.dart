@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'package:provider/provider.dart';
 import '../providers/newsprovider.dart';
 import '../widgets/newsviews.dart';
 
+// ignore: camel_case_types
 class searchScreen extends StatefulWidget {
   final String searchedText;
   const searchScreen({Key? key, required this.searchedText}) : super(key: key);
@@ -14,16 +16,16 @@ class searchScreen extends StatefulWidget {
   _searchScreenState createState() => _searchScreenState();
 }
 
+// ignore: camel_case_types
 class _searchScreenState extends State<searchScreen> {
   TextEditingController searchTextController = TextEditingController();
-  var _isLoading;
+  var _isLoading = true;
   var _hasInitialized = false;
-  var _isShowmore = false;
 
   @override
   void didChangeDependencies() {
     if (!_hasInitialized) {
-      print("ini");
+      //print("ini");
       setState(() {
         _isLoading = true;
       });
@@ -44,7 +46,7 @@ class _searchScreenState extends State<searchScreen> {
   void onSearched() {
     if (searchTextController.text == "") //blank text
     {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text("Add Something to search news for",
               style: TextStyle(color: Colors.red))));
     } else {
@@ -67,7 +69,7 @@ class _searchScreenState extends State<searchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print("built");
+    //print("built");
     final List<String> genre = [
       "fashion",
       "tech",
@@ -87,7 +89,7 @@ class _searchScreenState extends State<searchScreen> {
         child: SingleChildScrollView(
           child: Container(
             height: MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 gradient: LinearGradient(
                     colors: [Colors.red, Colors.pink],
                     begin: Alignment.topRight,
@@ -134,16 +136,22 @@ class _searchScreenState extends State<searchScreen> {
                           onTap: () {
                             Navigator.pushReplacementNamed(context, "/");
                           },
-                          child: Icon(Icons.home),
+                          child: const Icon(
+                            Icons.home,
+                            color: Colors.pink,
+                          ),
                         )
                       ])),
                   //container showing all the news
                   if (_isLoading)
                     SingleChildScrollView(
-                      child: Container(
+                      child: SizedBox(
                         height: MediaQuery.of(context).size.height - 100,
-                        child: Center(
-                          child: CircularProgressIndicator(),
+                        child: const Center(
+                          child: SpinKitSpinningLines(
+                            color: Colors.white,
+                            size: 50.0,
+                          ),
                         ),
                       ),
                     ), //100 is the height of search bar
@@ -167,7 +175,7 @@ class _searchScreenState extends State<searchScreen> {
                                 : "No news related to ${searchTextController.text} :(",
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 15,
+                                fontSize: 18,
                                 color: Colors.white),
                           ),
                         )),
@@ -175,8 +183,10 @@ class _searchScreenState extends State<searchScreen> {
                           right: 10,
                           bottom: 80,
                           child: FloatingActionButton(
-                            child: const Icon(Icons.home),
-                            backgroundColor: Colors.green.shade800,
+                            child: const Icon(
+                              Icons.home,
+                            ),
+                            backgroundColor: Colors.orange,
                             onPressed: () {
                               Navigator.pushReplacementNamed(context, "/");
                             },
@@ -188,7 +198,7 @@ class _searchScreenState extends State<searchScreen> {
                       _isvalidSearch) //the below container will be shown if the loading is false but the data we get is valid
                     Container(
                       decoration: _isLoading
-                          ? BoxDecoration(color: Colors.transparent)
+                          ? const BoxDecoration(color: Colors.transparent)
                           : BoxDecoration(
                               gradient: LinearGradient(
                                   // stops: [0, 0.9],
@@ -204,8 +214,8 @@ class _searchScreenState extends State<searchScreen> {
                       child: Column(
                         children: [
                           Container(
-                            padding: EdgeInsets.only(top: 10),
-                            margin: EdgeInsets.only(left: 20),
+                            padding: const EdgeInsets.only(top: 10),
+                            margin: const EdgeInsets.only(left: 20),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
@@ -231,7 +241,7 @@ class _searchScreenState extends State<searchScreen> {
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(13),
                                       color: Colors.pink),
-                                  margin: EdgeInsets.symmetric(
+                                  margin: const EdgeInsets.symmetric(
                                       horizontal: 17, vertical: 10),
                                   child: InkWell(
                                     //like gesture detector but also shows a ripple effect
@@ -248,92 +258,102 @@ class _searchScreenState extends State<searchScreen> {
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(13)),
-                                      child: Stack(
-                                        children: [
-                                          ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(13),
-                                              child:
-                                                  // Image.asset(
-                                                  //   "assets/images/try.jpg",
-                                                  Image.network(
-                                                data[index].ImageToUrl,
-                                                height: double.infinity,
-                                                fit: BoxFit.fill,
-                                                width: double.infinity,
-                                                errorBuilder: (BuildContext
-                                                        context, //if there is an error in showing the image then the widget inside his will be shown instead
-                                                    Object exception,
-                                                    StackTrace? stackTrace) {
-                                                  return Image.asset(
-                                                    "assets/images/try.jpg",
-                                                    height: double.infinity,
-                                                    fit: BoxFit.fill,
-                                                    width: double.infinity,
-                                                  );
-                                                },
-                                              )),
-                                          Positioned(
-                                            //his tells the positioning of the child inside this over the children of the stack
-                                            bottom: 0,
-                                            left: 0,
-                                            right: 0,
-                                            child: Container(
-                                                padding: EdgeInsets.only(
-                                                    left: 5, bottom: 15),
-                                                decoration: BoxDecoration(
-                                                    gradient: LinearGradient(
-                                                        colors: [
-                                                          Colors.orange.shade400
-                                                              .withOpacity(0.5),
-                                                          Colors.pink.shade400
-                                                              .withOpacity(0.5)
-                                                        ],
-                                                        begin: Alignment
-                                                            .bottomLeft,
-                                                        end: Alignment
-                                                            .bottomRight),
-                                                    borderRadius:
-                                                        const BorderRadius.only(
-                                                            bottomRight:
-                                                                Radius.circular(
-                                                                    13))), //bottm righ was not having border radius even becuase of its parent's radius so have to do it manually
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      data[index].title,
-                                                      style: const TextStyle(
-                                                          fontSize: 15,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Colors.white),
-                                                    ),
-                                                    Text(
-                                                        data[index]
-                                                                    .title
-                                                                    .length >
-                                                                55
-                                                            ? "${data[index].desc.substring(0, 56)}..."
-                                                            : data[index]
-                                                                .desc, //if length of the decs is more than 55 characters then dont show the whole and only show till 56 ...otherwise show the full if its kength is less than 55
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(13),
+                                        child: Stack(
+                                          children: [
+                                            ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(13),
+                                                child:
+                                                    // Image.asset(
+                                                    //   "assets/images/try.jpg",
+                                                    Image.network(
+                                                  data[index].ImageToUrl,
+                                                  height: double.infinity,
+                                                  fit: BoxFit.fill,
+                                                  width: double.infinity,
+                                                  errorBuilder: (BuildContext
+                                                          context, //if there is an error in showing the image then the widget inside his will be shown instead
+                                                      Object exception,
+                                                      StackTrace? stackTrace) {
+                                                    return Image.asset(
+                                                      "assets/images/try.jpg",
+                                                      height: double.infinity,
+                                                      fit: BoxFit.fill,
+                                                      width: double.infinity,
+                                                    );
+                                                  },
+                                                )),
+                                            Positioned(
+                                              //his tells the positioning of the child inside this over the children of the stack
+                                              bottom: 0,
+                                              left: 0,
+                                              right: 0,
+                                              child: Container(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 5, bottom: 15),
+                                                  decoration: BoxDecoration(
+                                                      gradient: LinearGradient(
+                                                          colors: [
+                                                            Colors.green
+                                                                .withOpacity(
+                                                                    0.5),
+                                                            Colors.blue
+                                                          ],
+                                                          begin: Alignment
+                                                              .bottomLeft,
+                                                          end: Alignment
+                                                              .bottomRight),
+                                                      borderRadius:
+                                                          const BorderRadius
+                                                                  .only(
+                                                              bottomRight: Radius
+                                                                  .circular(
+                                                                      13))), //bottm righ was not having border radius even becuase of its parent's radius so have to do it manually
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        data[index].title,
                                                         style: const TextStyle(
-                                                            fontSize: 13,
+                                                            fontSize: 15,
                                                             fontWeight:
                                                                 FontWeight.bold,
                                                             color:
-                                                                Colors.white54))
-                                                  ],
-                                                )),
-                                          )
-                                        ],
+                                                                Colors.white),
+                                                      ),
+                                                      Text(
+                                                          data[index]
+                                                                      .title
+                                                                      .length >
+                                                                  55
+                                                              ? "${data[index].desc.substring(0, 56)}..."
+                                                              : data[
+                                                                      index]
+                                                                  .desc, //if length of the decs is more than 55 characters then dont show the whole and only show till 56 ...otherwise show the full if its kength is less than 55
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize: 13,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: Colors
+                                                                      .white54))
+                                                    ],
+                                                  )),
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
                                 );
                               } catch (e) {
-                                print(e);
+                                //print(e);
                                 return Container();
                               }
                             },
@@ -345,7 +365,7 @@ class _searchScreenState extends State<searchScreen> {
                           ),
                           Container(
                             //to give margin from bottom
-                            margin: EdgeInsets.only(bottom: 30),
+                            margin: const EdgeInsets.only(bottom: 30),
                           )
                         ],
                       ),

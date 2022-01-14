@@ -3,17 +3,18 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../models/newsmodel.dart';
 
+// ignore: camel_case_types
 class newsProvider with ChangeNotifier {
-  List<newsData> _items = [];
-  List<newsData> _itemsindia = [];
-  List<newsData> _itembusiness = [];
-  List<newsData> _itemgeneral = [];
-  List<newsData> _itemhealth = [];
-  List<newsData> _itemscience = [];
-  List<newsData> _itemsports = [];
-  List<newsData> _itemtechnology = [];
-  List<newsData> _itementertainment = [];
-  List<newsData> _itemSearched = [];
+  final List<newsData> _items = [];
+  final List<newsData> _itemsindia = [];
+  final List<newsData> _itembusiness = [];
+  final List<newsData> _itemgeneral = [];
+  final List<newsData> _itemhealth = [];
+  final List<newsData> _itemscience = [];
+  final List<newsData> _itemsports = [];
+  final List<newsData> _itemtechnology = [];
+  final List<newsData> _itementertainment = [];
+  final List<newsData> _itemSearched = [];
 
   List<newsData> get item {
     return [..._items]; //returning the clone of this _items list
@@ -66,15 +67,17 @@ class newsProvider with ChangeNotifier {
           _items.add(instance); //adding this new instamce to the _items list
 
         } catch (e) {
-          print(e);
+          //print(e);
         }
       });
       notifyListeners();
-    } catch (err) {}
+    } catch (err) {
+      // print(err);
+    }
   }
 
   Future<void> fetchCategoryNews(String what, bool isSearched) async {
-    print("why bro");
+    //print("why bro");
     var url2 = "";
     // if (what == "india") {
     //   url2 =
@@ -115,44 +118,47 @@ class newsProvider with ChangeNotifier {
           //     ele["title"] !=
           //         null) //if we have any one of the above values as null then dont add this instance
           // {
-          if (isSearched) //agar search kara h to sidha _iem/serached me add krenge...agar search nhi kara tab he check krenge bakiyo ko
-          {
-            print("here");
-            _itemSearched.add(instance);
-          } else {
-            if (what == "india") {
-              _itemsindia
-                  .add(instance); //adding this new instance to the _items list
-            } else if (what == "business") {
-              _itembusiness.add(instance);
-            } else if (what == "entertainment") {
-              _itementertainment.add(instance);
-            } else if (what == "general") {
-              _itemgeneral.add(instance);
-            } else if (what == "health") {
-              _itemhealth.add(instance);
-            } else if (what == "science") {
-              _itemscience.add(instance);
-            } else if (what == "sports") {
-              _itemsports.add(instance);
-            } else //if what is equal to technology
+          if (ele["url"].toString().substring(0, 5) == "https") {
+            //so that it will take only those news having https and not http only
+            if (isSearched) //agar search kara h to sidha _iem/serached me add krenge...agar search nhi kara tab he check krenge bakiyo ko
             {
-              _itemtechnology.add(instance);
+              //print("here");
+              _itemSearched.add(instance);
+            } else {
+              if (what == "india") {
+                _itemsindia.add(
+                    instance); //adding this new instance to the _items list
+              } else if (what == "business") {
+                _itembusiness.add(instance);
+              } else if (what == "entertainment") {
+                _itementertainment.add(instance);
+              } else if (what == "general") {
+                _itemgeneral.add(instance);
+              } else if (what == "health") {
+                _itemhealth.add(instance);
+              } else if (what == "science") {
+                _itemscience.add(instance);
+              } else if (what == "sports") {
+                _itemsports.add(instance);
+              } else //if what is equal to technology
+              {
+                _itemtechnology.add(instance);
+              }
             }
           }
           //}
 
 // business entertainment general health science sports technology
         } catch (e) {
-          print(e);
-          print("hello2");
+          //print(e);
+          //print("hello2");
         }
       });
-      print(_itemSearched);
+      //print(_itemSearched);
       notifyListeners();
     } catch (err) {
-      print(err);
-      print("hello1");
+      //print(err);
+      //print("hello1");
     }
   }
 }

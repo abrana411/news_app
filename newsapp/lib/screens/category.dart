@@ -1,13 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:newsapp/models/newsmodel.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../providers/newsprovider.dart';
 import '../widgets/newsviews.dart';
 
+// ignore: camel_case_types
 class categoryScreen extends StatefulWidget {
-  static final routeName = "/category";
+  static const routeName = "/category";
   final String category;
   const categoryScreen({Key? key, required this.category}) : super(key: key);
 
@@ -15,6 +16,7 @@ class categoryScreen extends StatefulWidget {
   _categoryScreenState createState() => _categoryScreenState();
 }
 
+// ignore: camel_case_types
 class _categoryScreenState extends State<categoryScreen> {
   var _isShowmore = false;
   var _isLoading = true;
@@ -60,7 +62,7 @@ class _categoryScreenState extends State<categoryScreen> {
             color: Colors.black,
             child: Text(firstcharCap(widget.category) + " News")),
         centerTitle: true, //will make title appear on center
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(30))),
         flexibleSpace: Container(
           //to give gradient we can use flexible
@@ -84,13 +86,16 @@ class _categoryScreenState extends State<categoryScreen> {
                       colors: [Colors.red.shade200, Colors.deepOrange.shade300],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight),
-                  border:
-                      Border(top: BorderSide(width: 2, color: Colors.white70))),
+                  border: const Border(
+                      top: BorderSide(width: 2, color: Colors.white70))),
           child: _isLoading
-              ? Container(
-                  height: 400,
+              ? SizedBox(
+                  height: MediaQuery.of(context).size.height,
                   child: const Center(
-                    child: CircularProgressIndicator(),
+                    child: SpinKitSpinningLines(
+                      color: Colors.black,
+                      size: 50.0,
+                    ),
                   ),
                 )
               : Column(
@@ -103,7 +108,7 @@ class _categoryScreenState extends State<categoryScreen> {
                             height: 250,
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(13),
-                                color: Colors.green),
+                                color: Colors.pink),
                             margin: const EdgeInsets.symmetric(
                                 horizontal: 15, vertical: 10),
                             child: InkWell(
@@ -151,15 +156,14 @@ class _categoryScreenState extends State<categoryScreen> {
                                       left: 0,
                                       right: 0,
                                       child: Container(
-                                          padding: EdgeInsets.only(
+                                          padding: const EdgeInsets.only(
                                               left: 5, bottom: 15),
                                           decoration: BoxDecoration(
                                               gradient: LinearGradient(
                                                   colors: [
-                                                    Colors.orange.shade400
+                                                    Colors.green
                                                         .withOpacity(0.5),
-                                                    Colors.pink.shade400
-                                                        .withOpacity(0.5)
+                                                    Colors.blue
                                                   ],
                                                   begin: Alignment.bottomLeft,
                                                   end: Alignment.bottomRight),
@@ -197,7 +201,7 @@ class _categoryScreenState extends State<categoryScreen> {
                             ),
                           );
                         } catch (e) {
-                          print(e);
+                          //print(e);
                           return Container();
                         }
                       },
@@ -217,7 +221,7 @@ class _categoryScreenState extends State<categoryScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                          margin: EdgeInsets.all(10),
+                          margin: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(25),
                               border:
@@ -225,28 +229,28 @@ class _categoryScreenState extends State<categoryScreen> {
                               color: Colors.red),
                           child: TextButton.icon(
                             onPressed: () {
-                              print("hello");
+                              //print("hello");
                               setState(() {
                                 _isShowmore = !_isShowmore;
                               });
                             },
                             icon: _isShowmore
-                                ? Icon(
+                                ? const Icon(
                                     Icons.expand_less_outlined,
                                     color: Colors.amber,
                                   )
-                                : Icon(
+                                : const Icon(
                                     Icons.expand_more_sharp,
                                     color: Colors.amber,
                                   ),
                             label: _isShowmore
-                                ? Text(
+                                ? const Text(
                                     "Show Less",
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white),
                                   )
-                                : Text(
+                                : const Text(
                                     "Show More",
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
