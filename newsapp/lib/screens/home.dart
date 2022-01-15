@@ -34,7 +34,6 @@ class _HomeScreenState extends State<HomeScreen> {
   // business entertainment general health science sports technology
   List<String> topics = [
     "Business",
-    "India",
     "Entertainment",
     "Sports",
     "Health",
@@ -236,7 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           height: 150,
                           child: Center(
                             child: SpinKitSpinningLines(
-                              color: Colors.orange,
+                              color: Colors.black,
                               size: 50.0,
                             ),
                           ),
@@ -379,7 +378,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           height: 400,
                           child: Center(
                             child: SpinKitSpinningLines(
-                              color: Colors.white,
+                              color: Colors.black,
                               size: 50.0,
                             ),
                           ),
@@ -450,7 +449,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     Image.network(
                                                   data[index].ImageToUrl,
                                                   height: double.infinity,
-                                                  fit: BoxFit.fitHeight,
+                                                  fit: BoxFit.fill,
+                                                  width: double.infinity,
                                                   errorBuilder: (BuildContext
                                                           context, //if there is an error in showing the image then the widget inside his will be shown instead
                                                       Object exception,

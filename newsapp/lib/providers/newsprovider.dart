@@ -98,7 +98,7 @@ class newsProvider with ChangeNotifier {
     } else //if searched text is there then it can be anything and for the initial india also
     {
       url2 =
-          "https://newsapi.org/v2/top-headlines?q=$what&apiKey=dde8eb71d71b4f79a8f5e0b9943fd73a";
+          "https://newsapi.org/v2/top-headlines?country=in&q=$what&apiKey=dde8eb71d71b4f79a8f5e0b9943fd73a";
     }
     try {
       final res2 = await http.get(Uri.parse(url2));
