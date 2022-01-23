@@ -15,32 +15,39 @@ class newsProvider with ChangeNotifier {
   final List<newsData> _itemtechnology = [];
   final List<newsData> _itementertainment = [];
   final List<newsData> _itemSearched = [];
+  final List<newsData> _itemadditional = [];
 
   List<newsData> get item {
     return [..._items]; //returning the clone of this _items list
   }
 
-  List<newsData> itemCategory(String cat) {
+  List<newsData> itemCategory(String cat, bool isadditional) {
     //here not making a getter rather a method that will give the copy of the desired ategory list having news
-    if (cat == "india") {
+    if (cat == "india" && !isadditional) {
       return [..._itemsindia];
-    } else if (cat == "business") {
+    } else if (cat == "business" && !isadditional) {
       return [..._itembusiness];
-    } else if (cat == "entertainment") {
+    } else if (cat == "entertainment" && !isadditional) {
       return [..._itementertainment];
-    } else if (cat == "general") {
+    } else if (cat == "general" && !isadditional) {
       return [..._itemgeneral];
-    } else if (cat == "health") {
+    } else if (cat == "health" && !isadditional) {
       return [..._itemhealth];
-    } else if (cat == "science") {
+    } else if (cat == "science" && !isadditional) {
       return [..._itemscience];
-    } else if (cat == "sports") {
+    } else if (cat == "sports" && !isadditional) {
       return [..._itemsports];
-    } else if (cat == "technology") {
+    } else if (cat == "technology" && !isadditional) {
       return [..._itemtechnology];
     } else //if any thing is searched
     {
-      return [..._itemSearched];
+      if (isadditional) {
+        //agar country ya language h to
+        //print("yoyoyo");
+        return [..._itemadditional];
+      } else {
+        return [..._itemSearched];
+      }
     }
   }
 
@@ -65,7 +72,6 @@ class newsProvider with ChangeNotifier {
               title: ele["title"]);
 
           _items.add(instance); //adding this new instamce to the _items list
-
         } catch (e) {
           //print(e);
         }
@@ -73,6 +79,47 @@ class newsProvider with ChangeNotifier {
       notifyListeners();
     } catch (err) {
       // print(err);
+    }
+  }
+
+  Future<void> fetchAdditional(String counlan, bool iscountry) async {
+    _itemadditional
+        .clear(); //shuru me khali kar denge koi previous chej hogi isme to
+    //print(counlan + "   coun");
+    var url = "";
+    if (!iscountry) //agar language ki chahiyie to
+    {
+      url =
+          "https://newsapi.org/v2/everything?language=$counlan&q=-china&apiKey=dde8eb71d71b4f79a8f5e0b9943fd73a";
+    } else {
+      url =
+          "https://newsapi.org/v2/top-headlines?country=$counlan&apiKey=dde8eb71d71b4f79a8f5e0b9943fd73a";
+    }
+
+    try {
+      final res = await http.get(Uri.parse(url));
+      final data = jsonDecode(res.body);
+      //print(url);
+      data["articles"].forEach((ele) {
+        try {
+          newsData instance = newsData(
+              //creating a new instance
+              UrltoMore: ele["url"],
+              ImageToUrl: ele["urlToImage"],
+              desc: ele["description"],
+              title: ele["title"]);
+          if (ele["url"].toString().substring(0, 5) == "https") {
+            _itemadditional.add(instance);
+          }
+        } catch (err) {
+          //print(err);
+          //print("1");
+        }
+      });
+      notifyListeners();
+    } catch (err) {
+      //print(err);
+      //print("2");
     }
   }
 

@@ -80,7 +80,7 @@ class _searchScreenState extends State<searchScreen> {
     final random = Random(); //creating instance of random class
     final String exgenre = genre[random.nextInt(genre.length)];
     var data = Provider.of<newsProvider>(context, listen: false)
-        .itemCategory(widget.searchedText);
+        .itemCategory(widget.searchedText, false);
     var _isvalidSearch = data.isEmpty
         ? false
         : true; //if we haven't got any news related to this then we will simply show an image or a message indicating no news related to particular seach perform
@@ -171,8 +171,8 @@ class _searchScreenState extends State<searchScreen> {
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
                             searchTextController.text == ""
-                                ? "No news related to ${widget.searchedText} :("
-                                : "No news related to ${searchTextController.text} :(",
+                                ? "No news related to '${widget.searchedText}' :("
+                                : "No news related to '${searchTextController.text}' :(",
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,

@@ -50,7 +50,7 @@ class _categoryScreenState extends State<categoryScreen> {
   @override
   Widget build(BuildContext context) {
     var data = Provider.of<newsProvider>(context, listen: false).itemCategory(
-        widget.category); //getting the list of news of desired category
+        widget.category, false); //getting the list of news of desired category
     return Scaffold(
       extendBodyBehindAppBar:
           true, //this make the content of body behind appbar too..and making it true as want to show rounded brder in appbar so...have to make color behind appbar same with body i will exend body from top itself

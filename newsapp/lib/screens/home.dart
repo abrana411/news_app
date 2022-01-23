@@ -13,6 +13,7 @@ import '../providers/newsprovider.dart';
 import '../screens/category.dart';
 import '../screens/search.dart';
 import '../widgets/newsviews.dart';
+import '../widgets/draw_er.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = "/home";
@@ -89,7 +90,8 @@ class _HomeScreenState extends State<HomeScreen> {
     var data = Provider.of<newsProvider>(context, listen: false)
         .item; //getting the list once we have fetched the data
     var dataSlider = Provider.of<newsProvider>(context, listen: false)
-        .itemCategory("india"); //getting the list once we have fetched the data
+        .itemCategory(
+            "india", false); //getting the list once we have fetched the data
 
     var smalldataSlider = dataSlider.length >
             7 //if we have like 1000 items and we want only few then it is better to make contraint inside the for loop in the provider where we are fetching data ...because agar usse is tarike se krenge to uper vali list me sab kuch store hoga and that will take a lot of memory
@@ -106,6 +108,11 @@ class _HomeScreenState extends State<HomeScreen> {
     final random = Random(); //creating instance of random class
     final String exgenre = genre[random.nextInt(genre.length)];
     return Scaffold(
+        drawer: Theme(
+            data: Theme.of(context).copyWith(
+                //changing the clor of the drawer using theme
+                canvasColor: Colors.pink[400]),
+            child: const sideScr()),
         extendBodyBehindAppBar:
             true, //this make the content of body behind appbar too..and making it true as want to show rounded brder in appbar so...have to make color behind appbar same with body i will exend body from top itself
 
