@@ -5,7 +5,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-
+import 'package:share_plus/share_plus.dart';
+//import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart'; //for random method
 
@@ -83,6 +84,12 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     _hasFetcheddata = true;
     super.didChangeDependencies();
+  }
+
+  void onShare(BuildContext context, String link) {
+    Share.share(
+      link,
+    );
   }
 
   @override
@@ -295,22 +302,48 @@ class _HomeScreenState extends State<HomeScreen> {
                                           borderRadius: const BorderRadius.only(
                                               topLeft: Radius.circular(20),
                                               topRight: Radius.circular(20)),
-                                          child: Image.network(
-                                            item.ImageToUrl,
-                                            height: double.infinity,
-                                            fit: BoxFit.fitHeight,
-                                            errorBuilder: (BuildContext
-                                                    context, //if there is an error in showing the image then the widget inside his will be shown instead
-                                                Object exception,
-                                                StackTrace? stackTrace) {
-                                              return Image.asset(
-                                                "assets/images/try.jpg",
-                                                height: double.infinity,
-                                                fit: BoxFit.fill,
-                                                width: double.infinity,
-                                              );
-                                            },
-                                          ),
+                                          child: Stack(children: [
+                                            Image.network(
+                                              item.ImageToUrl,
+                                              height: double.infinity,
+                                              fit: BoxFit.fitHeight,
+                                              errorBuilder: (BuildContext
+                                                      context, //if there is an error in showing the image then the widget inside his will be shown instead
+                                                  Object exception,
+                                                  StackTrace? stackTrace) {
+                                                return Image.asset(
+                                                  "assets/images/try.jpg",
+                                                  height: double.infinity,
+                                                  fit: BoxFit.fill,
+                                                  width: double.infinity,
+                                                );
+                                              },
+                                            ),
+                                            Positioned(
+                                                top: 10,
+                                                right: 10,
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    onShare(context,
+                                                        item.UrltoMore);
+                                                  },
+                                                  child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            10),
+                                                    decoration: BoxDecoration(
+                                                        color: Colors.black54,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(15)),
+                                                    child: const Icon(
+                                                      Icons.share,
+                                                      color: Colors.white,
+                                                      size: 20,
+                                                    ),
+                                                  ),
+                                                ))
+                                          ]),
                                         ),
                                       ),
 
@@ -336,7 +369,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     begin: Alignment.topCenter,
                                                     end:
                                                         Alignment.bottomCenter),
-                                              ), //bottm righ was not having border radius even becuase of its parent's radius so have to do it manually
+                                              ), //bottm right was not having border radius even becuase of its parent's radius so have to do it manually
                                               child: Column(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
@@ -415,10 +448,27 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                             ListView.builder(
+                              padding: EdgeInsets.zero,
                               itemBuilder: (ctx, index) {
                                 try {
                                   //handling for any errors in displaying this too
-                                  return Container(
+                                  return
+                                      // Slidable(
+                                      //     startActionPane: ActionPane(
+                                      //       extentRatio: 1,
+                                      //       motion: const ScrollMotion(),
+                                      //       children: [
+                                      //         Container(
+                                      //           padding: EdgeInsets.zero,
+                                      //           width: 300,
+                                      //           child: Text(data[index]
+                                      //               .desc
+                                      //               .substring(0, 100)),
+                                      //         )
+                                      //       ],
+                                      //     ),
+                                      //child:
+                                      Container(
                                     height: 250,
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(13),
@@ -453,23 +503,54 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     // Image.asset(
                                                     //   "assets/images/try.jpg",
 
-                                                    Image.network(
-                                                  data[index].ImageToUrl,
-                                                  height: double.infinity,
-                                                  fit: BoxFit.fill,
-                                                  width: double.infinity,
-                                                  errorBuilder: (BuildContext
-                                                          context, //if there is an error in showing the image then the widget inside his will be shown instead
-                                                      Object exception,
-                                                      StackTrace? stackTrace) {
-                                                    return Image.asset(
-                                                      "assets/images/try.jpg",
-                                                      height: double.infinity,
-                                                      fit: BoxFit.fill,
-                                                      width: double.infinity,
-                                                    );
-                                                  },
-                                                ),
+                                                    Stack(children: [
+                                                  Image.network(
+                                                    data[index].ImageToUrl,
+                                                    height: double.infinity,
+                                                    fit: BoxFit.fill,
+                                                    width: double.infinity,
+                                                    errorBuilder: (BuildContext
+                                                            context, //if there is an error in showing the image then the widget inside his will be shown instead
+                                                        Object exception,
+                                                        StackTrace?
+                                                            stackTrace) {
+                                                      return Image.asset(
+                                                        "assets/images/try.jpg",
+                                                        height: double.infinity,
+                                                        fit: BoxFit.fill,
+                                                        width: double.infinity,
+                                                      );
+                                                    },
+                                                  ),
+                                                  Positioned(
+                                                      top: 10,
+                                                      right: 10,
+                                                      child: GestureDetector(
+                                                        onTap: () {
+                                                          onShare(
+                                                              context,
+                                                              data[index]
+                                                                  .UrltoMore);
+                                                        },
+                                                        child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(10),
+                                                          decoration: BoxDecoration(
+                                                              color: Colors
+                                                                  .black54,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          15)),
+                                                          child: const Icon(
+                                                            Icons.share,
+                                                            color: Colors.white,
+                                                            size: 20,
+                                                          ),
+                                                        ),
+                                                      ))
+                                                ]),
                                               ),
                                               Positioned(
                                                 //his tells the positioning of the child inside this over the children of the stack

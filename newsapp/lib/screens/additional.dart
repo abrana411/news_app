@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../providers/newsprovider.dart';
 import '../widgets/newsviews.dart';
@@ -46,6 +47,12 @@ class _additionalScrState extends State<additionalScr> {
           true; //taki bs ek bar he initialize ho kyunki ye didChangeDependencies runs a few times before the build method
     }
     super.didChangeDependencies();
+  }
+
+  void onShare(BuildContext context, String link) {
+    Share.share(
+      link,
+    );
   }
 
   @override
@@ -138,23 +145,48 @@ class _additionalScrState extends State<additionalScr> {
                                             // Image.asset(
                                             //   "assets/images/try.jpg",
 
-                                            Image.network(
-                                          data[index].ImageToUrl,
-                                          height: double.infinity,
-                                          fit: BoxFit.fill,
-                                          width: double.infinity,
-                                          errorBuilder: (BuildContext
-                                                  context, //if there is an error in showing the image then the widget inside his will be shown instead
-                                              Object exception,
-                                              StackTrace? stackTrace) {
-                                            return Image.asset(
-                                              "assets/images/try.jpg",
-                                              height: double.infinity,
-                                              fit: BoxFit.fill,
-                                              width: double.infinity,
-                                            );
-                                          },
-                                        ),
+                                            Stack(children: [
+                                          Image.network(
+                                            data[index].ImageToUrl,
+                                            height: double.infinity,
+                                            fit: BoxFit.fill,
+                                            width: double.infinity,
+                                            errorBuilder: (BuildContext
+                                                    context, //if there is an error in showing the image then the widget inside his will be shown instead
+                                                Object exception,
+                                                StackTrace? stackTrace) {
+                                              return Image.asset(
+                                                "assets/images/try.jpg",
+                                                height: double.infinity,
+                                                fit: BoxFit.fill,
+                                                width: double.infinity,
+                                              );
+                                            },
+                                          ),
+                                          Positioned(
+                                              top: 10,
+                                              right: 10,
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  onShare(context,
+                                                      data[index].UrltoMore);
+                                                },
+                                                child: Container(
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  decoration: BoxDecoration(
+                                                      color: Colors.black54,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              15)),
+                                                  child: const Icon(
+                                                    Icons.share,
+                                                    color: Colors.white,
+                                                    size: 20,
+                                                  ),
+                                                ),
+                                              ))
+                                        ]),
                                       ),
                                       Positioned(
                                         //his tells the positioning of the child inside this over the children of the stack
